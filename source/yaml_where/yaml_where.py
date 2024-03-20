@@ -75,5 +75,16 @@ class YAMLWhere:
                         )
                     else:
                         return YAMLWhere(child_value).get_value(*keys)
+        elif isinstance(self.node, SequenceNode):
+            if isinstance(key, int):
+                if key < len(self.node.value):
+                    if not keys:
+                        value_node = self.node.value[key]
+                        return Range(
+                            Position(value_node.start_mark.line, value_node.start_mark.column),
+                            Position(value_node.end_mark.line, value_node.end_mark.column),
+                        )
+                    else:
+                        return YAMLWhere(self.node.value[key]).get(*keys) 
 
         raise KeyError(key)
