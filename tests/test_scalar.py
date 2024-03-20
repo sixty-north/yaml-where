@@ -1,12 +1,12 @@
 import pytest
-from yaml_where.range import Position, Range
+from helpers import rng
 from yaml_where.yaml_where import YAMLWhere
 
 
 def test_get_top_level_scalar():
     yaml = "hello"
     source_map = YAMLWhere.from_string(yaml)
-    assert source_map.get() == Range(Position(0, 0), Position(0, 5))
+    assert source_map.get() == rng(0, 0, 0, 5)
 
 
 def test_no_argument_non_scalar():
