@@ -1,5 +1,5 @@
 import pytest
-from yaml_where.exceptions import UndefinedAccessError
+from yaml_where.exceptions import MissingKeyError, UndefinedAccessError
 from helpers import rng
 from yaml_where.yaml_where import YAMLWhere
 
@@ -18,3 +18,15 @@ def test_no_argument_non_scalar():
     source_map = YAMLWhere.from_string(yaml)
     with pytest.raises(UndefinedAccessError):
         source_map.get()
+
+
+def test_get_with_key():
+    yaml = "hello"
+    with pytest.raises(MissingKeyError):
+        YAMLWhere.from_string(yaml).get("a")
+
+
+def test_get_key():
+    yaml = "hello"
+    with pytest.raises(MissingKeyError):
+        YAMLWhere.from_string(yaml).get_key("a")

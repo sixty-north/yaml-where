@@ -63,6 +63,8 @@ class YAMLWhere:
                         )
                     else:
                         return YAMLWhere(self.node.value[key]).get(*keys)
+            else:
+                raise UndefinedAccessError(f"Can not access a sequence with non-integer key {key}")
 
         raise MissingKeyError(key)
 

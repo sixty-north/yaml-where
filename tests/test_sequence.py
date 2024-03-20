@@ -99,3 +99,18 @@ def test_get_value_missing_index_nested():
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
     with pytest.raises(MissingKeyError):
         source_map.get_value(2, 3)
+
+
+def test_get_non_integer_key():
+    yaml = """
+    [1, 2, 3]
+    """
+    yw = YAMLWhere.from_string(clean_yaml(yaml))
+    with pytest.raises(UndefinedAccessError):
+        yw.get("a")
+
+
+def test_get_value_non_integer_key():
+    yaml = "[1, 2, 3]"
+    with pytest.raises(MissingKeyError):
+        YAMLWhere.from_string(yaml).get_value("a")
