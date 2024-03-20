@@ -32,7 +32,7 @@ jobs:
           python -m site
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install ".[test]"
-          coverage run --branch ---source=yaml_where -m pytest tests
+          coverage run --branch --source=yaml_where -m pytest tests
           python -m coverage report --show-missing --fail-under=100
 
   package:
