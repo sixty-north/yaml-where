@@ -1,3 +1,5 @@
+"""Basic types for representing positions and ranges in a document."""
+
 from dataclasses import dataclass
 
 

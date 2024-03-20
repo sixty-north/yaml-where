@@ -1,12 +1,29 @@
+"""Main implementation of source map calculation.
+"""
+
+from abc import ABC, abstractmethod
+
 from ruamel.yaml import YAML, MappingNode, Node, ScalarNode, SequenceNode
 from yaml_where.exceptions import MissingKeyError, UndefinedAccessError, UnsupportedNodeTypeError
 from yaml_where.range import Position, Range
-from abc import ABC, abstractmethod
 
 
 class YAMLWhere(ABC):
+    """Base class for source map calculators for different YAML data types.
+
+    This defines the interface for all source map calculators, but is itself abstract.
+    """
+
     @classmethod
     def from_string(cls, source: str):
+        """Create a YAMLWhere from a YAML string.
+
+        Args:
+            source (str): The YAML string to parse.
+
+        Returns:
+            YAMLWhere: The YAMLWhere instance with source map information.
+        """
         y = YAML(typ="rt")
         node = y.compose(source)
         return _from_node(node)
@@ -18,35 +35,46 @@ class YAMLWhere(ABC):
     def get(self, *keys: str | int) -> Range:
         """Get the range for an entire entry.
 
-        If the final key/index is into a sequence, this gets the extents of the sequence entry. If it's into a
-        mapping, this gets the extents of the key and value combined.
+        Different subclasses will have different behaviors for this method. Mappings will return the range
+        for the key-value pair, while sequences will return the range for the sequence element.
 
         Raises:
-            MissingKeyError: If a key is not found in a mapping or an index is out of bounds for a sequence.
-            UndefinedAccessError: If an inappropriate key type is supplied. For example, if a string is used
-                to access a sequence.
+            MissingKeyError: A key is of the appropriate type for an element, but is missing in that elements. For
+                example, if an integer index is beyond the end of a sequence element.
+            UndefinedAccessError: If a key is of an inappropriate type for an element. For example, if a string is
+                used to access a sequence element.
         """
 
     @abstractmethod
     def get_key(self, key: str | int, *keys: str | int) -> Range:
         """Get the range for a mapping key.
 
+        So for a mapping, this would return the range for the key in the key-value pair.
+
         Raises:
-            MissingKeyError: If a key is not found in a mapping or an index is out of bounds for a sequence.
-            UndefinedAccessError: If an inappropriate key type is supplied. For example, if a string is used
-                to access a sequence.
+            MissingKeyError: A key is of the appropriate type for an element, but is missing in that elements. For
+                example, if an integer index is beyond the end of a sequence element.
+            UndefinedAccessError: If a key is of an inappropriate type for an element. For example, if a string is
+                used to access a sequence element. Or if 'key' is no a defined concept for the element.
         """
 
     @abstractmethod
     def get_value(self, key: str | int, *keys: str | int) -> Range:
-        """Get the range for a mapping value.
+        """Get the range for a value.
+
+        For a mapping this gets the range of the value in the key-value pair. For a sequence this gets the range
+        of the sequence element (just like get()).
 
         Raises:
-            KeyError: If the key is not found.
+            MissingKeyError: A key is of the appropriate type for an element, but is missing in that elements. For
+                example, if an integer index is beyond the end of a sequence element.
+            UndefinedAccessError: If a key is of an inappropriate type for an element. For example, if a string is
+                used to access a sequence element. Or if 'key' is no a defined concept for the element.
         """
 
 
 def _from_node(node: Node) -> YAMLWhere:
+    "Construct a YAMLWhere based on the type of the node."
     if isinstance(node, ScalarNode):
         return YAMLWhereScalar(node)
 
@@ -59,10 +87,14 @@ def _from_node(node: Node) -> YAMLWhere:
     elif node is None:
         return YAMLWhereNull(node)
 
-    raise UnsupportedNodeTypeError(f"Unsupported node type {type(node).__name__}")  # pragma: no cover
+    raise UnsupportedNodeTypeError(
+        f"Unsupported node type {type(node).__name__}"
+    )  # pragma: no cover
 
 
 class YAMLWhereScalar(YAMLWhere):
+    "Source map calculator for scalar nodes."
+
     def __init__(self, node: ScalarNode):
         if not isinstance(node, ScalarNode):
             raise ValueError(f"YAMLWhereScalar can not be constructed with a {type(node).__name__}")
@@ -81,11 +113,12 @@ class YAMLWhereScalar(YAMLWhere):
         raise UndefinedAccessError("get_key() is not defined for scalar nodes")
 
     def get_value(self, key: str | int, *keys: str | int) -> Range:
-        # TODO: Should this instead return the same as get()?
         raise UndefinedAccessError("get_value() is not defined for scalar nodes")
 
 
 class YAMLWhereSequence(YAMLWhere):
+    "Source map calculator for sequence nodes."
+
     def __init__(self, node: SequenceNode):
         if not isinstance(node, SequenceNode):
             raise ValueError(
@@ -110,8 +143,8 @@ class YAMLWhereSequence(YAMLWhere):
 
         try:
             value_node = self.node.value[key]
-        except IndexError:
-            raise MissingKeyError(key)
+        except IndexError as err:
+            raise MissingKeyError(key) from err
 
         return Range(
             Position(value_node.start_mark.line, value_node.start_mark.column),
@@ -133,8 +166,8 @@ class YAMLWhereSequence(YAMLWhere):
 
         try:
             value_node = self.node.value[key]
-        except IndexError:
-            raise MissingKeyError(key)
+        except IndexError as err:
+            raise MissingKeyError(key) from err
 
         return Range(
             Position(value_node.start_mark.line, value_node.start_mark.column),
@@ -143,6 +176,8 @@ class YAMLWhereSequence(YAMLWhere):
 
 
 class YAMLWhereMapping(YAMLWhere):
+    "Source map calculator for mapping nodes."
+
     def __init__(self, node: MappingNode):
         if not isinstance(node, MappingNode):
             raise ValueError(
@@ -199,6 +234,8 @@ class YAMLWhereMapping(YAMLWhere):
 
 
 class YAMLWhereNull(YAMLWhere):
+    "Source map calculator for null nodes."
+
     def get(self, *keys: str | int) -> Range:
         raise UndefinedAccessError("get() is not defined for null nodes")
 

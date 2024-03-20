@@ -1,14 +1,18 @@
+"""Exceptions for yaml-where.
+"""
+
+
 class YAMLWhereException(Exception):
-    pass
+    "Base for all yaml-where exceptions."
 
 
 class MissingKeyError(YAMLWhereException, KeyError):
-    pass
+    """A key is missing from a mapping or sequence."""
 
 
 class UndefinedAccessError(YAMLWhereException):
-    pass
+    """An access is undefined for a given node and key."""
 
 
 class UnsupportedNodeTypeError(YAMLWhereException):
-    pass
+    """A YAML node type is not supported."""
