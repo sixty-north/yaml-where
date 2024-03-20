@@ -112,5 +112,5 @@ def test_get_non_integer_key():
 
 def test_get_value_non_integer_key():
     yaml = "[1, 2, 3]"
-    with pytest.raises(MissingKeyError):
+    with pytest.raises(UndefinedAccessError):
         YAMLWhere.from_string(yaml).get_value("a")

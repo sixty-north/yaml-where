@@ -22,11 +22,11 @@ def test_no_argument_non_scalar():
 
 def test_get_with_key():
     yaml = "hello"
-    with pytest.raises(MissingKeyError):
+    with pytest.raises(UndefinedAccessError):
         YAMLWhere.from_string(yaml).get("a")
 
 
 def test_get_key():
     yaml = "hello"
-    with pytest.raises(MissingKeyError):
+    with pytest.raises(UndefinedAccessError):
         YAMLWhere.from_string(yaml).get_key("a")

@@ -1,7 +1,7 @@
 import pytest
 from helpers import clean_yaml, rng
 from yaml_where import YAMLWhere
-from yaml_where.exceptions import MissingKeyError
+from yaml_where.exceptions import MissingKeyError, UndefinedAccessError
 
 
 def test_get_top_level():
@@ -111,5 +111,5 @@ def test_get_value_nested_missing_key():
             doo: hola
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    with pytest.raises(MissingKeyError):
+    with pytest.raises(UndefinedAccessError):
         source_map.get_value("a", "b", "q")

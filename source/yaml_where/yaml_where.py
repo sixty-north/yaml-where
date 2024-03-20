@@ -20,8 +20,9 @@ class YAMLWhere:
         mapping, this gets the extents of the key and value combined.
 
         Raises:
-            MissingKeyError: If the key is not found.
-            UndefinedAccessError: If this is called with zero arguments on a non-scalar YAML document.
+            MissingKeyError: If a key is not found in a mapping or an index is out of bounds for a sequence.
+            UndefinedAccessError: If an inappropriate key type is supplied. For example, if a string is used
+                to access a sequence.
         """
         if not keys:
             if isinstance(self.node, ScalarNode):
@@ -29,7 +30,9 @@ class YAMLWhere:
                     Position(self.node.start_mark.line, self.node.start_mark.column),
                     Position(self.node.end_mark.line, self.node.end_mark.column),
                 )
-            raise UndefinedAccessError("get() with no arguments is not defined for non-scalar nodes")
+            raise UndefinedAccessError(
+                "get() with no arguments is not defined for non-scalar nodes"
+            )
 
         return self._get(keys[0], *keys[1:])
 
@@ -52,27 +55,36 @@ class YAMLWhere:
                         )
                     else:
                         return YAMLWhere(child_value).get(*keys)
+
+            raise MissingKeyError(key)
+
         elif isinstance(self.node, SequenceNode):
-            if isinstance(key, int):
-                if key < len(self.node.value):
-                    if not keys:
-                        value_node = self.node.value[key]
-                        return Range(
-                            Position(value_node.start_mark.line, value_node.start_mark.column),
-                            Position(value_node.end_mark.line, value_node.end_mark.column),
-                        )
-                    else:
-                        return YAMLWhere(self.node.value[key]).get(*keys)
-            else:
+            if not isinstance(key, int):
                 raise UndefinedAccessError(f"Can not access a sequence with non-integer key {key}")
 
-        raise MissingKeyError(key)
+            if not keys:
+                try:
+                    value_node = self.node.value[key]
+                except IndexError:
+                    raise MissingKeyError(key)
+
+                return Range(
+                    Position(value_node.start_mark.line, value_node.start_mark.column),
+                    Position(value_node.end_mark.line, value_node.end_mark.column),
+                )
+
+            else:
+                return YAMLWhere(self.node.value[key]).get(*keys)
+
+        raise UndefinedAccessError(f"Can not access a {type(self.node).__name__} with key {key}")
 
     def get_key(self, key: str | int, *keys: str | int) -> Range:
         """Get the range for a mapping key.
 
         Raises:
-            KeyError: If the key is not found.
+            MissingKeyError: If a key is not found in a mapping or an index is out of bounds for a sequence.
+            UndefinedAccessError: If an inappropriate key type is supplied. For example, if a string is used
+                to access a sequence.
         """
         if isinstance(self.node, MappingNode):
             for child_key, child_value in self.node.value:
@@ -84,12 +96,14 @@ class YAMLWhere:
                         )
                     else:
                         return YAMLWhere(child_value).get_key(*keys)
+            raise MissingKeyError(key)
+
         elif isinstance(self.node, SequenceNode):
             if not keys:
                 raise UndefinedAccessError("get_key() is not defined for sequence elements")
             return YAMLWhere(self.node.value[key]).get_key(*keys)
 
-        raise MissingKeyError(key)
+        raise UndefinedAccessError(f"Can not access a {type(self.node).__name__} with key {key}")
 
     def get_value(self, key: str | int, *keys: str | int) -> Range:
         """Get the range for a mapping value.
@@ -107,16 +121,24 @@ class YAMLWhere:
                         )
                     else:
                         return YAMLWhere(child_value).get_value(*keys)
-        elif isinstance(self.node, SequenceNode):
-            if isinstance(key, int):
-                if key < len(self.node.value):
-                    if not keys:
-                        value_node = self.node.value[key]
-                        return Range(
-                            Position(value_node.start_mark.line, value_node.start_mark.column),
-                            Position(value_node.end_mark.line, value_node.end_mark.column),
-                        )
-                    else:
-                        return YAMLWhere(self.node.value[key]).get_value(*keys)
+            raise MissingKeyError(key)
 
-        raise MissingKeyError(key)
+        elif isinstance(self.node, SequenceNode):
+            if not isinstance(key, int):
+                raise UndefinedAccessError(f"Can not access a sequence with non-integer key {key}")
+
+            if keys:
+                return YAMLWhere(self.node.value[key]).get_value(*keys)
+
+            else:
+                try:
+                    value_node = self.node.value[key]
+                except IndexError:
+                    raise MissingKeyError(key)
+
+                return Range(
+                    Position(value_node.start_mark.line, value_node.start_mark.column),
+                    Position(value_node.end_mark.line, value_node.end_mark.column),
+                )
+
+        raise UndefinedAccessError(f"Can not access a {type(self.node).__name__} with key {key}")
