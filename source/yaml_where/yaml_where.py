@@ -1,4 +1,5 @@
-from ruamel.yaml import YAML, MappingNode, Node, SequenceNode, ScalarNode
+from ruamel.yaml import YAML, MappingNode, Node, ScalarNode, SequenceNode
+from yaml_where.exceptions import MissingKeyError, UndefinedAccessError
 from yaml_where.range import Position, Range
 
 
@@ -19,8 +20,8 @@ class YAMLWhere:
         mapping, this gets the extents of the key and value combined.
 
         Raises:
-            KeyError: If the key is not found.
-            ValueError: If this is called with zero arguments on a non-scalar YAML document.
+            MissingKeyError: If the key is not found.
+            UndefinedAccessError: If this is called with zero arguments on a non-scalar YAML document.
         """
         if not keys:
             if isinstance(self.node, ScalarNode):
@@ -28,7 +29,7 @@ class YAMLWhere:
                     Position(self.node.start_mark.line, self.node.start_mark.column),
                     Position(self.node.end_mark.line, self.node.end_mark.column),
                 )
-            raise ValueError("get() with no arguments is not defined for non-scalar nodes")
+            raise UndefinedAccessError("get() with no arguments is not defined for non-scalar nodes")
 
         return self._get(keys[0], *keys[1:])
 
@@ -63,7 +64,7 @@ class YAMLWhere:
                     else:
                         return YAMLWhere(self.node.value[key]).get(*keys)
 
-        raise KeyError(key)
+        raise MissingKeyError(key)
 
     def get_key(self, key: str | int, *keys: str | int) -> Range:
         """Get the range for a mapping key.
@@ -83,10 +84,10 @@ class YAMLWhere:
                         return YAMLWhere(child_value).get_key(*keys)
         elif isinstance(self.node, SequenceNode):
             if not keys:
-                raise ValueError("get_key() is not defined for sequence elements")
+                raise UndefinedAccessError("get_key() is not defined for sequence elements")
             return YAMLWhere(self.node.value[key]).get_key(*keys)
 
-        raise KeyError(key)
+        raise MissingKeyError(key)
 
     def get_value(self, key: str | int, *keys: str | int) -> Range:
         """Get the range for a mapping value.
@@ -116,4 +117,4 @@ class YAMLWhere:
                     else:
                         return YAMLWhere(self.node.value[key]).get_value(*keys)
 
-        raise KeyError(key)
+        raise MissingKeyError(key)

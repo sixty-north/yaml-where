@@ -1,6 +1,7 @@
 import pytest
 from helpers import clean_yaml, rng
 from yaml_where import YAMLWhere
+from yaml_where.exceptions import MissingKeyError
 
 
 def test_get_top_level():
@@ -62,7 +63,7 @@ def test_get_value_nested():
 
 def test_get_top_level_missing_key():
     source_map = YAMLWhere.from_string("a: 1\nb: 42")
-    with pytest.raises(KeyError):
+    with pytest.raises(MissingKeyError):
         source_map.get("c")
 
 
@@ -74,13 +75,13 @@ def test_get_nested_missing_key():
             d: hola
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    with pytest.raises(KeyError):
+    with pytest.raises(MissingKeyError):
         source_map.get("a", "e")
 
 
 def test_get_key_top_level_missing_key():
     source_map = YAMLWhere.from_string("a: 1\nbb: 42")
-    with pytest.raises(KeyError):
+    with pytest.raises(MissingKeyError):
         source_map.get_key("c")
 
 
@@ -92,13 +93,13 @@ def test_get_key_nested_missing_key():
             doo: hola
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    with pytest.raises(KeyError):
+    with pytest.raises(MissingKeyError):
         source_map.get_key("a", "c", "llama")
 
 
 def test_get_value_top_level_missing_key():
     source_map = YAMLWhere.from_string("a: 1\nbb: 42")
-    with pytest.raises(KeyError):
+    with pytest.raises(MissingKeyError):
         source_map.get_value("c")
 
 
@@ -110,5 +111,5 @@ def test_get_value_nested_missing_key():
             doo: hola
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    with pytest.raises(KeyError):
+    with pytest.raises(MissingKeyError):
         source_map.get_value("a", "b", "q")

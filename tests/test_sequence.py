@@ -1,6 +1,7 @@
 import pytest
 from helpers import clean_yaml, rng
 from yaml_where import YAMLWhere
+from yaml_where.exceptions import MissingKeyError, UndefinedAccessError
 
 
 def test_get_top_level():
@@ -65,38 +66,38 @@ def test_get_value_nested():
     assert source_map.get_value(1, 1, 2) == rng(1, 13, 1, 14)
 
 
-def test_get_key_top_level_raises_ValueError():
+def test_get_key_top_level():
     yaml = "[1, 2, 3]"
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    with pytest.raises(ValueError):
+    with pytest.raises(UndefinedAccessError):
         source_map.get_key(0)
 
 
-def test_get_missing_index_top_level_raises_KeyError():
+def test_get_missing_index_top_level():
     yaml = "[1, 2, 3]"
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    with pytest.raises(KeyError):
+    with pytest.raises(MissingKeyError):
         source_map.get(4)
 
 
-def test_get_value_missing_index_top_level_raises_KeyError():
+def test_get_value_missing_index_top_level():
     yaml = "[1, 2, 3]"
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    with pytest.raises(KeyError):
+    with pytest.raises(MissingKeyError):
         source_map.get_value(4)
 
 
-def test_get_missing_index_nested_raises_KeyError():
+def test_get_missing_index_nested():
     yaml = "[1, 2, [3, 4, 5]]"
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    with pytest.raises(KeyError):
+    with pytest.raises(MissingKeyError):
         source_map.get(2, 3)
 
 
-def test_get_value_missing_index_nested_raises_KeyError():
+def test_get_value_missing_index_nested():
     yaml = "[1, 2, [3, 4, 5]]"
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    with pytest.raises(KeyError):
+    with pytest.raises(MissingKeyError):
         source_map.get_value(2, 3)
 
 

@@ -1,4 +1,5 @@
 import pytest
+from yaml_where.exceptions import UndefinedAccessError
 from helpers import rng
 from yaml_where.yaml_where import YAMLWhere
 
@@ -15,5 +16,5 @@ def test_no_argument_non_scalar():
     - b: 2
     """
     source_map = YAMLWhere.from_string(yaml)
-    with pytest.raises(ValueError):
+    with pytest.raises(UndefinedAccessError):
         source_map.get()
