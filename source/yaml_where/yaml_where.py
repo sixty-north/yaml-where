@@ -2,6 +2,7 @@
 """
 
 from abc import ABC, abstractmethod
+from functools import singledispatch
 
 from ruamel.yaml import YAML, MappingNode, Node, ScalarNode, SequenceNode
 from yaml_where.exceptions import MissingKeyError, UndefinedAccessError, UnsupportedNodeTypeError
@@ -72,24 +73,6 @@ class YAMLWhere(ABC):
                 used to access a sequence element. Or if 'key' is no a defined concept for the element.
         """
 
-
-def _from_node(node: Node) -> YAMLWhere:
-    "Construct a YAMLWhere based on the type of the node."
-    if isinstance(node, ScalarNode):
-        return YAMLWhereScalar(node)
-
-    elif isinstance(node, MappingNode):
-        return YAMLWhereMapping(node)
-
-    elif isinstance(node, SequenceNode):
-        return YAMLWhereSequence(node)
-
-    elif node is None:
-        return YAMLWhereNull(node)
-
-    raise UnsupportedNodeTypeError(
-        f"Unsupported node type {type(node).__name__}"
-    )  # pragma: no cover
 
 
 class YAMLWhereScalar(YAMLWhere):
@@ -244,3 +227,32 @@ class YAMLWhereNull(YAMLWhere):
 
     def get_value(self, key: str | int, *keys: str | int) -> Range:
         raise UndefinedAccessError("get_value() is not defined for null nodes")
+
+
+@singledispatch
+def _from_node(node: Node) -> YAMLWhere:
+    "Construct a YAMLWhere based on the type of the node."
+    raise UnsupportedNodeTypeError(
+        f"Unsupported node type {type(node).__name__}"
+    )  # pragma: no cover
+
+
+@_from_node.register(ScalarNode)
+def _(node):
+    return YAMLWhereScalar(node)
+
+
+@_from_node.register(MappingNode)
+def _(node):
+    return YAMLWhereMapping(node)
+
+
+@_from_node.register(SequenceNode)
+def _(node):
+    return YAMLWhereSequence(node)
+
+
+@_from_node.register(type(None))
+def _(node):
+    return YAMLWhereNull(node)
+
