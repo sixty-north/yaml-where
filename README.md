@@ -16,25 +16,25 @@ YAML documents.
 
 Find the range containg the the key and value of a map entry:
 
-```
+```python
 source_map = YAMLWhere.from_string("a: 1\nb: 42")
 assert source_map.get("b") == Range(Position(1, 0), Position(1, 5))
 ```
 
 Or get the range of just the key:
-```
+```python
 source_map = YAMLWhere.from_string("a: 1\nb: 42")
 assert source_map.get_key("a") == Range(Position(0, 0), Position(0, 1))
 ```
 
 Or just the value:
-```
+```python
 source_map = YAMLWhere.from_string("a: 1\nbb: 42")
 assert source_map.get_value("bb") == Range(Position(1, 4), Position(1, 6))
 ```
 
 You can also look up nested locations:
-```
+```python
 yaml = """a:
     b: 42
     c:
@@ -49,7 +49,7 @@ assert source_map.get_key("a", "c", "doo") == Range(Position(3, 8), Position(3, 
 ### Sequences
 
 You can also find ranges for sequence elements:
-```
+```python
 yaml = """[1,
  a, foo,
  
