@@ -8,3 +8,7 @@ class MissingKeyError(YAMLWhereException, KeyError):
 
 class UndefinedAccessError(YAMLWhereException):
     pass
+
+
+class UnsupportedNodeTypeError(YAMLWhereException):
+    pass

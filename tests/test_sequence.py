@@ -1,4 +1,5 @@
 import pytest
+from yaml_where.yaml_where import YAMLWhereSequence
 from helpers import clean_yaml, rng
 from yaml_where import YAMLWhere
 from yaml_where.exceptions import MissingKeyError, UndefinedAccessError
@@ -114,3 +115,8 @@ def test_get_value_non_integer_key():
     yaml = "[1, 2, 3]"
     with pytest.raises(UndefinedAccessError):
         YAMLWhere.from_string(yaml).get_value("a")
+
+
+def test_constructor_checks_node_type():
+    with pytest.raises(ValueError):
+        YAMLWhereSequence(None)
