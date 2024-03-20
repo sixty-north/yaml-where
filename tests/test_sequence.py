@@ -99,7 +99,3 @@ def test_get_value_missing_index_nested():
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
     with pytest.raises(MissingKeyError):
         source_map.get_value(2, 3)
-
-
-# TODO:
-# - test exceptions
