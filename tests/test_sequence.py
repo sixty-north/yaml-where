@@ -1,7 +1,7 @@
 import pytest
-from yaml_where.range import Position, Range
 from helpers import clean_yaml
 from yaml_where import YAMLWhere
+from yaml_where.range import Position, Range
 
 
 def test_get_top_level():
@@ -47,6 +47,7 @@ def test_get_value_top_level():
     assert source_map.get_value(1) == Range(Position(1, 1), Position(1, 2))
     assert source_map.get_value(2) == Range(Position(1, 4), Position(1, 7))
     assert source_map.get_value(3) == Range(Position(3, 5), Position(3, 13))
+
 
 def test_get_value_nested():
     yaml = """
@@ -101,7 +102,4 @@ def test_get_value_missing_index_nested_raises_KeyError():
 
 
 # TODO:
-# - test arbitrary nesting
 # - test exceptions
-# - numeric indices
-# - top-level scalars
