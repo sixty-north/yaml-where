@@ -48,6 +48,9 @@ class YAMLWhere:
 
     def get_key(self, key: str | int, *keys: str | int) -> Range:
         """Get the range for a mapping key.
+
+        Raises:
+            KeyError: If the key is not found.
         """
         if isinstance(self.node, MappingNode):
             for child_key, child_value in self.node.value:
@@ -64,6 +67,9 @@ class YAMLWhere:
 
     def get_value(self, key: str | int, *keys: str | int) -> Range:
         """Get the range for a mapping value.
+
+        Raises:
+            KeyError: If the key is not found.
         """
         if isinstance(self.node, MappingNode):
             for child_key, child_value in self.node.value:
