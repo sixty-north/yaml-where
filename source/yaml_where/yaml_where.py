@@ -62,6 +62,9 @@ class YAMLWhere:
                         )
                     else:
                         return YAMLWhere(child_value).get_key(*keys)
+        elif isinstance(self.node, SequenceNode):
+            if not keys:
+                raise ValueError('get_key() is not defined for sequence elements')
 
         raise KeyError(key)
 
