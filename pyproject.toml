@@ -19,7 +19,7 @@ dependencies = ["ruamel.yaml"]
 [project.optional-dependencies]
 dev = ["ruff", "bump-my-version"]
 doc = ["sphinx", "sphinx-rtd-theme"]
-test = ["pytest"]
+test = ["pytest", "coverage"]
 
 [project.urls]
 repository = "https://github.com/sixty-north/yaml-where"
