@@ -1,17 +1,59 @@
+[project]
+name = "yaml_where"
+requires-python = ">= 3.11"
+dynamic = ["version"]
+authors = [
+    { name = "Sixty North AS", email = "systems+yaml-where@sixty-north.com" },
+]
+description = "Source maps for YAML files"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { file = "LICENSE.txt" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = ["ruamel.yaml"]
+
+[project.optional-dependencies]
+dev = ["ruff", "bump-my-version"]
+doc = ["sphinx", "sphinx-rtd-theme"]
+test = ["pytest"]
+
+[project.urls]
+repository = "https://github.com/sixty-north/yaml-where"
+
+[tool.setuptools.dynamic]
+version = { attr = "yaml_where.version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["source"]
+
+[tool.bumpversion]
+current_version = "0.2.1"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+tag = true
+commit = true
+message = "Bump version: {current_version} → {new_version}"
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+
+[[tool.bumpversion.files]]
+filename = "source/yaml_where/version.py"
+
 [build-system]
 build-backend = 'setuptools.build_meta'
 # Minimum requirements for the build system to execute.
-requires = ["setuptools>=49.9.0"]  # PEP 508 specifications.
+requires = ["setuptools>=49.9.0"] # PEP 508 specifications.
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-testpaths = [
-    "tests",
-]
-norecursedirs="tests/helpers"
+testpaths = ["tests"]
+norecursedirs = "tests/helpers"
 log_cli = true
 log_cli_level = "DEBUG"
 
-[tool.black]
-line-length = 100
-target-version = ['py311']
+[tool.ruff]
+line-length = 120
