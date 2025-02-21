@@ -27,7 +27,7 @@ jobs:
       - name: Install project
         run: uv sync --group test
       - name: "Run tests"
-        run: uv run pytest tests
+        run: uv run coverage run --branch --source=yaml_where -m pytest tests
       - name: "Check coverage"
         run: uv run coverage report --show-missing --fail-under=100
 
