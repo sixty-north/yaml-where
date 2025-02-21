@@ -14,9 +14,5 @@ def clean_yaml(s: str) -> str:
     return "\n".join(trimmed)
 
 
-def rng(start_line: int, start_col: int, end_line: int, end_col: int):
-    return Range(Position(start_line, start_col), Position(end_line, end_col))
-
-
 def extent(start_line: int, start_col: int, length: int):
-    return rng(start_line, start_col, start_line, start_col + length)
+    return Range.from_parts(start_line, start_col, start_line, start_col + length)

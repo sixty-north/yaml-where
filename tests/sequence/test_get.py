@@ -1,6 +1,7 @@
 import pytest
+from yaml_where.range import Range
 from yaml_where.yaml_where import YAMLWhereSequence
-from yaml_where.testing.helpers import clean_yaml, rng
+from yaml_where.testing.helpers import clean_yaml
 from yaml_where import YAMLWhere
 from yaml_where.exceptions import MissingKeyError, UndefinedAccessError
 
@@ -13,10 +14,10 @@ def test_get_top_level():
          indented]
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    assert source_map.get(0) == rng(0, 1, 0, 2)
-    assert source_map.get(1) == rng(1, 1, 1, 2)
-    assert source_map.get(2) == rng(1, 4, 1, 7)
-    assert source_map.get(3) == rng(3, 5, 3, 13)
+    assert source_map.get(0) == Range.from_parts(0, 1, 0, 2)
+    assert source_map.get(1) == Range.from_parts(1, 1, 1, 2)
+    assert source_map.get(2) == Range.from_parts(1, 4, 1, 7)
+    assert source_map.get(3) == Range.from_parts(3, 5, 3, 13)
 
 
 def test_get_nested():
@@ -25,15 +26,15 @@ def test_get_nested():
     - [3, [4, 5, 6]]
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    assert source_map.get(0) == rng(0, 2, 0, 12)
-    assert source_map.get(0, 0) == rng(0, 3, 0, 4)
-    assert source_map.get(0, 1) == rng(0, 6, 0, 7)
-    assert source_map.get(0, 2) == rng(0, 9, 0, 11)
-    assert source_map.get(1, 0) == rng(1, 3, 1, 4)
-    assert source_map.get(1, 1) == rng(1, 6, 1, 15)
-    assert source_map.get(1, 1, 0) == rng(1, 7, 1, 8)
-    assert source_map.get(1, 1, 1) == rng(1, 10, 1, 11)
-    assert source_map.get(1, 1, 2) == rng(1, 13, 1, 14)
+    assert source_map.get(0) == Range.from_parts(0, 2, 0, 12)
+    assert source_map.get(0, 0) == Range.from_parts(0, 3, 0, 4)
+    assert source_map.get(0, 1) == Range.from_parts(0, 6, 0, 7)
+    assert source_map.get(0, 2) == Range.from_parts(0, 9, 0, 11)
+    assert source_map.get(1, 0) == Range.from_parts(1, 3, 1, 4)
+    assert source_map.get(1, 1) == Range.from_parts(1, 6, 1, 15)
+    assert source_map.get(1, 1, 0) == Range.from_parts(1, 7, 1, 8)
+    assert source_map.get(1, 1, 1) == Range.from_parts(1, 10, 1, 11)
+    assert source_map.get(1, 1, 2) == Range.from_parts(1, 13, 1, 14)
 
 
 def test_get_value_top_level():
@@ -44,10 +45,10 @@ def test_get_value_top_level():
          indented]
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    assert source_map.get_value(0) == rng(0, 1, 0, 2)
-    assert source_map.get_value(1) == rng(1, 1, 1, 2)
-    assert source_map.get_value(2) == rng(1, 4, 1, 7)
-    assert source_map.get_value(3) == rng(3, 5, 3, 13)
+    assert source_map.get_value(0) == Range.from_parts(0, 1, 0, 2)
+    assert source_map.get_value(1) == Range.from_parts(1, 1, 1, 2)
+    assert source_map.get_value(2) == Range.from_parts(1, 4, 1, 7)
+    assert source_map.get_value(3) == Range.from_parts(3, 5, 3, 13)
 
 
 def test_get_value_nested():
@@ -56,15 +57,15 @@ def test_get_value_nested():
     - [3, [4, 5, 6]]
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
-    assert source_map.get_value(0) == rng(0, 2, 0, 12)
-    assert source_map.get_value(0, 0) == rng(0, 3, 0, 4)
-    assert source_map.get_value(0, 1) == rng(0, 6, 0, 7)
-    assert source_map.get_value(0, 2) == rng(0, 9, 0, 11)
-    assert source_map.get_value(1, 0) == rng(1, 3, 1, 4)
-    assert source_map.get_value(1, 1) == rng(1, 6, 1, 15)
-    assert source_map.get_value(1, 1, 0) == rng(1, 7, 1, 8)
-    assert source_map.get_value(1, 1, 1) == rng(1, 10, 1, 11)
-    assert source_map.get_value(1, 1, 2) == rng(1, 13, 1, 14)
+    assert source_map.get_value(0) == Range.from_parts(0, 2, 0, 12)
+    assert source_map.get_value(0, 0) == Range.from_parts(0, 3, 0, 4)
+    assert source_map.get_value(0, 1) == Range.from_parts(0, 6, 0, 7)
+    assert source_map.get_value(0, 2) == Range.from_parts(0, 9, 0, 11)
+    assert source_map.get_value(1, 0) == Range.from_parts(1, 3, 1, 4)
+    assert source_map.get_value(1, 1) == Range.from_parts(1, 6, 1, 15)
+    assert source_map.get_value(1, 1, 0) == Range.from_parts(1, 7, 1, 8)
+    assert source_map.get_value(1, 1, 1) == Range.from_parts(1, 10, 1, 11)
+    assert source_map.get_value(1, 1, 2) == Range.from_parts(1, 13, 1, 14)
 
 
 def test_get_key_top_level():

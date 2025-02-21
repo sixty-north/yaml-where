@@ -1,13 +1,13 @@
 import pytest
-from yaml_where.exceptions import MissingKeyError, UndefinedAccessError
-from yaml_where.testing.helpers import rng
+from yaml_where.exceptions import UndefinedAccessError
+from yaml_where.range import Range
 from yaml_where.yaml_where import YAMLWhere, YAMLWhereScalar
 
 
 def test_get_top_level_scalar():
     yaml = "hello"
     source_map = YAMLWhere.from_string(yaml)
-    assert source_map.get() == rng(0, 0, 0, 5)
+    assert source_map.get() == Range.from_parts(0, 0, 0, 5)
 
 
 def test_no_argument_non_scalar():
