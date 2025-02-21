@@ -2,10 +2,12 @@
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from functools import singledispatch
 
 from ruamel.yaml import YAML, MappingNode, Node, ScalarNode, SequenceNode
-from yaml_where.exceptions import MissingKeyError, UndefinedAccessError, UnsupportedNodeTypeError
+from yaml_where.exceptions import MissingKeyError, NoSuchPathError, UndefinedAccessError, UnsupportedNodeTypeError
+from yaml_where.path import Index, Key, PathComponent, Value
 from yaml_where.range import Position, Range
 
 
@@ -31,6 +33,10 @@ class YAMLWhere(ABC):
 
     def __init__(self, node: Node):
         self.node = node
+
+    @abstractmethod
+    def get_path(self, pos: Position) -> Iterable[PathComponent]:
+        """Get the path corresponding to a Range."""
 
     @abstractmethod
     def get(self, *keys: str | int) -> Range:
@@ -83,6 +89,9 @@ class YAMLWhereScalar(YAMLWhere):
             raise ValueError(f"YAMLWhereScalar can not be constructed with a {type(node).__name__}")
         super().__init__(node)
 
+    def get_path(self, rng: Range) -> Iterable:
+        return []
+
     def get(self, *keys: str | int) -> Range:
         if keys:
             raise UndefinedAccessError("get() with no arguments is not defined for scalar nodes")
@@ -109,6 +118,14 @@ class YAMLWhereSequence(YAMLWhere):
             )
 
         super().__init__(node)
+
+    def get_path(self, pos: Position) -> Iterable:
+        for idx, child in enumerate(self.node.value):
+            if pos in Range.from_node(child):
+                yield Index(idx)
+                yield from _from_node(child).get_path(pos)
+                return
+        raise NoSuchPathError(f"Can not resolve the range {pos} to a path in {self.node.value}")
 
     def get(self, *keys: str | int) -> Range:
         if not keys:
@@ -169,6 +186,21 @@ class YAMLWhereMapping(YAMLWhere):
 
         super().__init__(node)
 
+    def get_path(self, pos: Position) -> Iterable[PathComponent]:
+        for key_node, value_node in self.node.value:
+            # Check if we're looking at the key
+            if pos in Range.from_node(key_node):
+                yield Key(key_node.value)
+                # yield from _from_node(value_node).get_path(pos)
+                return
+
+            elif pos in Range.from_node(value_node):
+                yield Value(key_node.value)
+                yield from _from_node(value_node).get_path(pos)
+                return
+
+        raise NoSuchPathError(f"Can not resolve the range {pos} to a path in {self.node.value}")
+
     def get(self, *keys: str | int) -> Range:
         if not keys:
             raise UndefinedAccessError(
@@ -218,6 +250,9 @@ class YAMLWhereMapping(YAMLWhere):
 
 class YAMLWhereNull(YAMLWhere):
     "Source map calculator for null nodes."
+
+    def get_path(self, pos: Position) -> Iterable:
+        raise NoSuchPathError("Can not resolve a path in a null node")
 
     def get(self, *keys: str | int) -> Range:
         raise UndefinedAccessError("get() is not defined for null nodes")

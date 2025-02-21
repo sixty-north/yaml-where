@@ -1,6 +1,6 @@
 import pytest
 from yaml_where.yaml_where import YAMLWhereSequence
-from helpers import clean_yaml, rng
+from yaml_where.testing.helpers import clean_yaml, rng
 from yaml_where import YAMLWhere
 from yaml_where.exceptions import MissingKeyError, UndefinedAccessError
 

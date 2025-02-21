@@ -1,4 +1,4 @@
-from helpers import clean_yaml, extent
+from yaml_where.testing.helpers import clean_yaml, extent
 from yaml_where import YAMLWhere
 
 

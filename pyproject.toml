@@ -67,6 +67,7 @@ testpaths = ["tests"]
 norecursedirs = "tests/helpers"
 log_cli = true
 log_cli_level = "DEBUG"
+addopts = ["--import-mode=importlib"]
 
 [tool.ruff]
 line-length = 120

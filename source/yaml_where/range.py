@@ -4,27 +4,39 @@ from dataclasses import dataclass
 from ruamel.yaml.nodes import Node
 
 
-@dataclass
+@dataclass(frozen=True)
 class Position:
     "Zero-based indexes describing a position in a document."
     line: int
     column: int
 
+    def __lt__(self, other):
+        "Check if this position is before another."
+        return (self.line, self.column) < (other.line, other.column)
+
     def __le__(self, other):
-        "Check if this position is before or at the same location as another."
-        return (self.line <= other.line) or (self.line == other.line and self.column <= other.column)
+        "Check if this position is before another."
+        return (self.line, self.column) <= (other.line, other.column)
 
 
-@dataclass
+@dataclass(frozen=True)
 class Range:
     "Half-open range describing a span inside a document."
     start: Position
     end: Position
 
 
+    def __post_init__(self):
+        if not self.start <= self.end:
+            raise ValueError(f"Range start ({self.start}) must be before end ({self.end}).")
+
     def __le__(self, other):
         "Check if this range is contained within another."
         return other.start <= self.start and self.end <= other.end
+
+    def __contains__(self, pos: Position):
+        "Check if a position is within this range."
+        return self.start <= pos < self.end
 
     @classmethod
     def beginning(cls, length=1):

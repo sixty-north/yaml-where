@@ -1,6 +1,6 @@
 import pytest
 from yaml_where.exceptions import MissingKeyError, UndefinedAccessError
-from helpers import rng
+from yaml_where.testing.helpers import rng
 from yaml_where.yaml_where import YAMLWhere, YAMLWhereScalar
 
 

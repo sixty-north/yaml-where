@@ -16,3 +16,7 @@ class UndefinedAccessError(YAMLWhereException):
 
 class UnsupportedNodeTypeError(YAMLWhereException):
     """A YAML node type is not supported."""
+
+
+class NoSuchPathError(YAMLWhereException):
+    """When a path in the document can not be found for a range."""
