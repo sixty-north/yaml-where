@@ -5,7 +5,7 @@ from typing import Any
 class PathComponent:
     @abstractmethod
     def value(self) -> Any:
-        pass
+        "Get the value associated with this path component"
 
     def __eq__(self, other):
         return self.value() == other.value()
