@@ -48,7 +48,7 @@ serialize = ["{major}.{minor}.{patch}"]
 tag = true
 commit = true
 message = "Bump version: {current_version} → {new_version}"
-tag_name = "v{new_version}"
+tag_name = "release/v{new_version}"
 tag_message = "Bump version: {current_version} → {new_version}"
 
 [[tool.bumpversion.files]]
