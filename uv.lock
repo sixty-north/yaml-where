@@ -812,10 +812,14 @@ dependencies = [
     { name = "ruamel-yaml" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "bump-my-version" },
+    { name = "coverage" },
+    { name = "pytest" },
     { name = "ruff" },
+    { name = "sphinx" },
+    { name = "sphinx-rtd-theme" },
 ]
 doc = [
     { name = "sphinx" },
@@ -826,36 +830,14 @@ test = [
     { name = "pytest" },
 ]
 
-[package.dev-dependencies]
-dev = [
-    { name = "bump-my-version" },
-    { name = "ruff" },
-    { name = "sphinx" },
-    { name = "sphinx-rtd-theme" },
-]
-doc = [
-    { name = "sphinx" },
-    { name = "sphinx-rtd-theme" },
-]
-test = [
-    { name = "sphinx" },
-    { name = "sphinx-rtd-theme" },
-]
-
 [package.metadata]
-requires-dist = [
-    { name = "bump-my-version", marker = "extra == 'dev'" },
-    { name = "coverage", marker = "extra == 'test'" },
-    { name = "pytest", marker = "extra == 'test'" },
-    { name = "ruamel-yaml" },
-    { name = "ruff", marker = "extra == 'dev'" },
-    { name = "sphinx", marker = "extra == 'doc'" },
-    { name = "sphinx-rtd-theme", marker = "extra == 'doc'" },
-]
+requires-dist = [{ name = "ruamel-yaml" }]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "bump-my-version", specifier = ">=0.32.1" },
+    { name = "coverage", specifier = ">=7.6.12" },
+    { name = "pytest", specifier = ">=8.3.4" },
     { name = "ruff", specifier = ">=0.9.7" },
     { name = "sphinx", specifier = ">=8.2.0" },
     { name = "sphinx-rtd-theme", specifier = ">=3.0.2" },
@@ -865,6 +847,6 @@ doc = [
     { name = "sphinx-rtd-theme", specifier = ">=3.0.2" },
 ]
 test = [
-    { name = "sphinx", specifier = ">=8.2.0" },
-    { name = "sphinx-rtd-theme", specifier = ">=3.0.2" },
+    { name = "coverage", specifier = ">=7.6.12" },
+    { name = "pytest", specifier = ">=8.3.4" },
 ]
