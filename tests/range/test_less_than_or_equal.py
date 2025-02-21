@@ -1,4 +1,4 @@
-from yaml_where.range import Position, Range
+from yaml_where.range import Range
 
 
 def test_proper_contained():

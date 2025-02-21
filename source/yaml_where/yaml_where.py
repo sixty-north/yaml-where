@@ -34,8 +34,19 @@ class YAMLWhere(ABC):
     def __init__(self, node: Node):
         self.node = node
 
+    def get_path(self, pos: Position) -> tuple[PathComponent, ...]:
+        """Get the path corresponding to a position in the document.
+
+        Args:
+            pos (Position): The position to get the path for.
+
+        Returns:
+            Iterable[PathComponent]: The path components for the position.
+        """
+        return tuple(self._get_path(pos))
+
     @abstractmethod
-    def get_path(self, pos: Position) -> Iterable[PathComponent]:
+    def _get_path(self, pos: Position) -> Iterable[PathComponent]:
         """Get the path corresponding to a Range."""
 
     @abstractmethod
@@ -89,7 +100,7 @@ class YAMLWhereScalar(YAMLWhere):
             raise ValueError(f"YAMLWhereScalar can not be constructed with a {type(node).__name__}")
         super().__init__(node)
 
-    def get_path(self, rng: Range) -> Iterable:
+    def _get_path(self, rng: Range) -> Iterable:
         return []
 
     def get(self, *keys: str | int) -> Range:
@@ -119,7 +130,7 @@ class YAMLWhereSequence(YAMLWhere):
 
         super().__init__(node)
 
-    def get_path(self, pos: Position) -> Iterable:
+    def _get_path(self, pos: Position) -> Iterable:
         for idx, child in enumerate(self.node.value):
             if pos in Range.from_node(child):
                 yield Index(idx)
@@ -186,7 +197,7 @@ class YAMLWhereMapping(YAMLWhere):
 
         super().__init__(node)
 
-    def get_path(self, pos: Position) -> Iterable[PathComponent]:
+    def _get_path(self, pos: Position) -> Iterable[PathComponent]:
         for key_node, value_node in self.node.value:
             # Check if we're looking at the key
             if pos in Range.from_node(key_node):
@@ -251,7 +262,7 @@ class YAMLWhereMapping(YAMLWhere):
 class YAMLWhereNull(YAMLWhere):
     "Source map calculator for null nodes."
 
-    def get_path(self, pos: Position) -> Iterable:
+    def _get_path(self, pos: Position) -> Iterable:
         raise NoSuchPathError("Can not resolve a path in a null node")
 
     def get(self, *keys: str | int) -> Range:

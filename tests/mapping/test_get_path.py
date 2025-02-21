@@ -9,16 +9,16 @@ def test_top_level():
     source_map = YAMLWhere.from_string("a: 1\nb: 42")
 
     r = source_map.get_key("a")
-    assert list(source_map.get_path(r.start)) == [Key("a")]
+    assert source_map.get_path(r.start) == (Key("a"),)
 
     r = source_map.get_value("a")
-    assert list(source_map.get_path(r.start)) == [Value("a")]
+    assert source_map.get_path(r.start) == (Value("a"),)
 
     r = source_map.get_key("b")
-    assert list(source_map.get_path(r.start)) == [Key("b")]
+    assert source_map.get_path(r.start) == (Key("b"),)
 
     r = source_map.get_value("b")
-    assert list(source_map.get_path(r.start)) == [Value("b")]
+    assert source_map.get_path(r.start) == (Value("b"),)
 
 
 def test_nested():
@@ -31,23 +31,23 @@ def test_nested():
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
 
     r = source_map.get_key("a", "b")
-    assert list(source_map.get_path(r.start)) == [Value("a"), Key("b")]
+    assert source_map.get_path(r.start) == (Value("a"), Key("b"),)
 
     r = source_map.get_value("a", "b")
-    assert list(source_map.get_path(r.start)) == [Value("a"), Value("b")]
+    assert source_map.get_path(r.start) == (Value("a"), Value("b"),)
 
     r = source_map.get_key("a", "c")
-    assert list(source_map.get_path(r.start)) == [Value("a"), Key("c")]
+    assert source_map.get_path(r.start) == (Value("a"), Key("c"),)
 
     # Interesting that we can't really distinguish between the value of 'c' and the key of 'd'.
     r = source_map.get_value("a", "c")
-    assert list(source_map.get_path(r.start)) == [Value("a"), Value("c"), Key("d")]
+    assert source_map.get_path(r.start) == (Value("a"), Value("c"), Key("d"),)
 
     r = source_map.get_key("a", "c", "d")
-    assert list(source_map.get_path(r.start)) == [Value("a"), Value("c"), Key("d")]
+    assert source_map.get_path(r.start) == (Value("a"), Value("c"), Key("d"),)
 
     r = source_map.get_value("a", "c", "d")
-    assert list(source_map.get_path(r.start)) == [Value("a"), Value("c"), Value("d")]
+    assert source_map.get_path(r.start) == (Value("a"), Value("c"), Value("d"),)
 
 
 def test_not_found():
@@ -62,4 +62,4 @@ def test_not_found():
     r = source_map.get_value("a", "c", "d")
 
     with pytest.raises(NoSuchPathError):
-        list(source_map.get_path(r.end))
+        source_map.get_path(r.end)

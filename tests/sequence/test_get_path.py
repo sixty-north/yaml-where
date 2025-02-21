@@ -15,16 +15,16 @@ def test_get_top_level():
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
 
     range_0 = source_map.get(0)
-    assert list(source_map.get_path(range_0.start)) == [Index(0)]
+    assert source_map.get_path(range_0.start) == (Index(0),)
 
     range_1 = source_map.get(1)
-    assert  list(source_map.get_path(range_1.start))== [Index(1)]
+    assert  source_map.get_path(range_1.start)== (Index(1),)
 
     range_2 = source_map.get(2)
-    assert list(source_map.get_path(range_2.start)) == [Index(2)]
+    assert source_map.get_path(range_2.start) == (Index(2),)
 
     range_3 = source_map.get(3)
-    assert list(source_map.get_path(range_3.start)) == [Index(3)]
+    assert source_map.get_path(range_3.start) == (Index(3),)
 
 
 def test_nested():
@@ -36,7 +36,7 @@ def test_nested():
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
 
     rng = source_map.get(1, 1)
-    assert list(source_map.get_path(rng.start)) == [Index(1), Index(1)]
+    assert source_map.get_path(rng.start) == (Index(1), Index(1))
 
 
 def test_not_found():
@@ -49,4 +49,4 @@ def test_not_found():
     rng = Range.from_parts(10, 0, 10, 4)
 
     with pytest.raises(NoSuchPathError):
-        list(source_map.get_path(rng.start))
+        source_map.get_path(rng.start)
