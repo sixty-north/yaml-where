@@ -7,18 +7,18 @@ def test_get():
     yaml = ""
     source_map = YAMLWhere.from_string(yaml)
     with pytest.raises(UndefinedAccessError):
-        source_map.get()
+        source_map.get_range()
 
 
 def test_get_key():
     yaml = ""
     source_map = YAMLWhere.from_string(yaml)
     with pytest.raises(UndefinedAccessError):
-        source_map.get_key(0)
+        source_map.get_key_range(0)
 
 
 def test_get_value():
     yaml = ""
     source_map = YAMLWhere.from_string(yaml)
     with pytest.raises(UndefinedAccessError):
-        source_map.get_value(0)
+        source_map.get_value_range(0)

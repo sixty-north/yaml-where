@@ -50,7 +50,7 @@ class YAMLWhere(ABC):
         """Get the path corresponding to a Range."""
 
     @abstractmethod
-    def get(self, *keys: str | int) -> Range:
+    def get_range(self, *keys: str | int) -> Range:
         """Get the range for an entire entry.
 
         Different subclasses will have different behaviors for this method. Mappings will return the range
@@ -64,7 +64,7 @@ class YAMLWhere(ABC):
         """
 
     @abstractmethod
-    def get_key(self, key: str | int, *keys: str | int) -> Range:
+    def get_key_range(self, key: str | int, *keys: str | int) -> Range:
         """Get the range for a mapping key.
 
         So for a mapping, this would return the range for the key in the key-value pair.
@@ -77,7 +77,7 @@ class YAMLWhere(ABC):
         """
 
     @abstractmethod
-    def get_value(self, key: str | int, *keys: str | int) -> Range:
+    def get_value_range(self, key: str | int, *keys: str | int) -> Range:
         """Get the range for a value.
 
         For a mapping this gets the range of the value in the key-value pair. For a sequence this gets the range
@@ -103,16 +103,16 @@ class YAMLWhereScalar(YAMLWhere):
     def _get_path(self, rng: Range) -> Iterable:
         return []
 
-    def get(self, *keys: str | int) -> Range:
+    def get_range(self, *keys: str | int) -> Range:
         if keys:
             raise UndefinedAccessError("get() with no arguments is not defined for scalar nodes")
 
         return Range.from_node(self.node)
 
-    def get_key(self, key: str | int, *keys: str | int) -> Range:
+    def get_key_range(self, key: str | int, *keys: str | int) -> Range:
         raise UndefinedAccessError("get_key() is not defined for scalar nodes")
 
-    def get_value(self, key: str | int, *keys: str | int) -> Range:
+    def get_value_range(self, key: str | int, *keys: str | int) -> Range:
         raise UndefinedAccessError("get_value() is not defined for scalar nodes")
 
 
@@ -135,7 +135,7 @@ class YAMLWhereSequence(YAMLWhere):
                 return
         raise NoSuchPathError(f"Can not resolve the range {pos} to a path in {self.node.value}")
 
-    def get(self, *keys: str | int) -> Range:
+    def get_range(self, *keys: str | int) -> Range:
         if not keys:
             raise UndefinedAccessError(
                 "get() with no arguments is not defined for sequence elements"
@@ -147,7 +147,7 @@ class YAMLWhereSequence(YAMLWhere):
             raise UndefinedAccessError(f"Can not access a sequence with non-integer key {key}")
 
         if keys:
-            return _from_node(self.node.value[key]).get(*keys)
+            return _from_node(self.node.value[key]).get_range(*keys)
 
         try:
             value_node = self.node.value[key]
@@ -156,18 +156,18 @@ class YAMLWhereSequence(YAMLWhere):
 
         return Range.from_node(value_node)
 
-    def get_key(self, key: str | int, *keys: str | int) -> Range:
+    def get_key_range(self, key: str | int, *keys: str | int) -> Range:
         if not keys:
             raise UndefinedAccessError("get_key() is not defined for sequence elements")
 
-        return _from_node(self.node.value[key]).get_key(*keys)
+        return _from_node(self.node.value[key]).get_key_range(*keys)
 
-    def get_value(self, key: str | int, *keys: str | int) -> Range:
+    def get_value_range(self, key: str | int, *keys: str | int) -> Range:
         if not isinstance(key, int):
             raise UndefinedAccessError(f"Can not access a sequence with non-integer key {key}")
 
         if keys:
-            return _from_node(self.node.value[key]).get_value(*keys)
+            return _from_node(self.node.value[key]).get_value_range(*keys)
 
         try:
             value_node = self.node.value[key]
@@ -203,7 +203,7 @@ class YAMLWhereMapping(YAMLWhere):
 
         raise NoSuchPathError(f"Can not resolve the range {pos} to a path in {self.node.value}")
 
-    def get(self, *keys: str | int) -> Range:
+    def get_range(self, *keys: str | int) -> Range:
         if not keys:
             raise UndefinedAccessError(
                 "get() with no arguments is not defined for sequence elements"
@@ -219,27 +219,27 @@ class YAMLWhereMapping(YAMLWhere):
                         Position(child_value.end_mark.line, child_value.end_mark.column),
                     )
                 else:
-                    return _from_node(child_value).get(*keys)
+                    return _from_node(child_value).get_range(*keys)
 
         raise MissingKeyError(key)
 
-    def get_key(self, key: str | int, *keys: str | int) -> Range:
+    def get_key_range(self, key: str | int, *keys: str | int) -> Range:
         for child_key, child_value in self.node.value:
             if child_key.value == key:
                 if not keys:
                     return Range.from_node(child_key)
                 else:
-                    return _from_node(child_value).get_key(*keys)
+                    return _from_node(child_value).get_key_range(*keys)
 
         raise MissingKeyError(key)
 
-    def get_value(self, key: str | int, *keys: str | int) -> Range:
+    def get_value_range(self, key: str | int, *keys: str | int) -> Range:
         for child_key, child_value in self.node.value:
             if child_key.value == key:
                 if not keys:
                     return Range.from_node(child_value)
                 else:
-                    return _from_node(child_value).get_value(*keys)
+                    return _from_node(child_value).get_value_range(*keys)
 
         raise MissingKeyError(key)
 
@@ -250,13 +250,13 @@ class YAMLWhereNull(YAMLWhere):
     def _get_path(self, pos: Position) -> Iterable:
         raise NoSuchPathError("Can not resolve a path in a null node")
 
-    def get(self, *keys: str | int) -> Range:
+    def get_range(self, *keys: str | int) -> Range:
         raise UndefinedAccessError("get() is not defined for null nodes")
 
-    def get_key(self, key: str | int, *keys: str | int) -> Range:
+    def get_key_range(self, key: str | int, *keys: str | int) -> Range:
         raise UndefinedAccessError("get_key() is not defined for null nodes")
 
-    def get_value(self, key: str | int, *keys: str | int) -> Range:
+    def get_value_range(self, key: str | int, *keys: str | int) -> Range:
         raise UndefinedAccessError("get_value() is not defined for null nodes")
 
 

@@ -14,16 +14,16 @@ def test_get_top_level():
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
 
-    range_0 = source_map.get(0)
+    range_0 = source_map.get_range(0)
     assert source_map.get_path(range_0.start) == (Index(0),)
 
-    range_1 = source_map.get(1)
+    range_1 = source_map.get_range(1)
     assert  source_map.get_path(range_1.start)== (Index(1),)
 
-    range_2 = source_map.get(2)
+    range_2 = source_map.get_range(2)
     assert source_map.get_path(range_2.start) == (Index(2),)
 
-    range_3 = source_map.get(3)
+    range_3 = source_map.get_range(3)
     assert source_map.get_path(range_3.start) == (Index(3),)
 
 
@@ -35,7 +35,7 @@ def test_nested():
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
 
-    rng = source_map.get(1, 1)
+    rng = source_map.get_range(1, 1)
     assert source_map.get_path(rng.start) == (Index(1), Index(1))
 
 
