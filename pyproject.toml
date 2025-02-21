@@ -16,10 +16,21 @@ classifiers = [
 ]
 dependencies = ["ruamel.yaml"]
 
-[project.optional-dependencies]
-dev = ["ruff", "bump-my-version"]
-doc = ["sphinx", "sphinx-rtd-theme"]
-test = ["pytest", "coverage"]
+[dependency-groups]
+dev = [
+    "bump-my-version>=0.32.1",
+    "ruff>=0.9.7",
+    { include-group = "doc"},
+    { include-group = "test"},
+]
+doc = [
+    "sphinx>=8.2.0",
+    "sphinx-rtd-theme>=3.0.2",
+]
+test = [
+    "sphinx>=8.2.0",
+    "sphinx-rtd-theme>=3.0.2",
+]
 
 [project.urls]
 repository = "https://github.com/sixty-north/yaml-where"
@@ -47,6 +58,8 @@ filename = "source/yaml_where/version.py"
 build-backend = 'setuptools.build_meta'
 # Minimum requirements for the build system to execute.
 requires = ["setuptools>=49.9.0"] # PEP 508 specifications.
+
+
 
 [tool.pytest.ini_options]
 minversion = "6.0"
