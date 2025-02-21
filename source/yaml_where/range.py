@@ -43,8 +43,6 @@ class Range:
         "Create a range that starts at the beginning of the document."
         return cls(Position(0, 0), Position(0, length))
 
-    # TODO: There are places where we could use this that are currently explicitly creating
-    # Ranges from Nodes.
     @classmethod
     def from_node(cls, node: Node):
         "Create a range that covers the entire node."

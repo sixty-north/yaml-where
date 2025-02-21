@@ -107,10 +107,7 @@ class YAMLWhereScalar(YAMLWhere):
         if keys:
             raise UndefinedAccessError("get() with no arguments is not defined for scalar nodes")
 
-        return Range(
-            Position(self.node.start_mark.line, self.node.start_mark.column),
-            Position(self.node.end_mark.line, self.node.end_mark.column),
-        )
+        return Range.from_node(self.node)
 
     def get_key(self, key: str | int, *keys: str | int) -> Range:
         raise UndefinedAccessError("get_key() is not defined for scalar nodes")
@@ -157,10 +154,7 @@ class YAMLWhereSequence(YAMLWhere):
         except IndexError as err:
             raise MissingKeyError(key) from err
 
-        return Range(
-            Position(value_node.start_mark.line, value_node.start_mark.column),
-            Position(value_node.end_mark.line, value_node.end_mark.column),
-        )
+        return Range.from_node(value_node)
 
     def get_key(self, key: str | int, *keys: str | int) -> Range:
         if not keys:
@@ -180,10 +174,7 @@ class YAMLWhereSequence(YAMLWhere):
         except IndexError as err:
             raise MissingKeyError(key) from err
 
-        return Range(
-            Position(value_node.start_mark.line, value_node.start_mark.column),
-            Position(value_node.end_mark.line, value_node.end_mark.column),
-        )
+        return Range.from_node(value_node)
 
 
 class YAMLWhereMapping(YAMLWhere):
@@ -236,10 +227,7 @@ class YAMLWhereMapping(YAMLWhere):
         for child_key, child_value in self.node.value:
             if child_key.value == key:
                 if not keys:
-                    return Range(
-                        Position(child_key.start_mark.line, child_key.start_mark.column),
-                        Position(child_key.end_mark.line, child_key.end_mark.column),
-                    )
+                    return Range.from_node(child_key)
                 else:
                     return _from_node(child_value).get_key(*keys)
 
@@ -249,10 +237,7 @@ class YAMLWhereMapping(YAMLWhere):
         for child_key, child_value in self.node.value:
             if child_key.value == key:
                 if not keys:
-                    return Range(
-                        Position(child_value.start_mark.line, child_value.start_mark.column),
-                        Position(child_value.end_mark.line, child_value.end_mark.column),
-                    )
+                    return Range.from_node(child_value)
                 else:
                     return _from_node(child_value).get_value(*keys)
 
