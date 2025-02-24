@@ -1,4 +1,4 @@
-name: Bump version
+name: Bump version and publish
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ on:
           - patch
 
 jobs:
-  build:
+  bump:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
@@ -27,9 +27,23 @@ jobs:
           BUMPVERSION_TAG: "true"
         with:
           args: ${{ inputs.bump-type }}
-          # github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Check
-        if: steps.bump.outputs.bumped == 'true'
+        if: steps.bump.outputs.bumped == 'false'
         run: |
-          echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
+          echo "Version was not bumped"
+          exit 1
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: bump
+    steps:
+     - name: Install uv
+       uses: astral-sh/setup-uv@v5 
+     - name: Build package
+       run: uv build --wheel
+     - name: Publish package
+       uses: pypa/gh-action-pypi-publish@release/v1
+       with:
+         user: __token__
+         password: ${{ secrets.PYPI_API_TOKEN }}
