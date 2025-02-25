@@ -16,6 +16,10 @@ def test_value_repr():
 def test_value_str():
     assert str(path.Value("value")) == "value/value"
 
+def test_item_str():
+    assert str(path.Item("value")) == "item/value"
+
+
 
 def test_index_repr():
     assert repr(path.Index(0)) == "Index(value=0)"

@@ -1,5 +1,5 @@
 import pytest
-from yaml_where.path import Item, Key, Value
+from yaml_where.path import Index, Item, Key, Value
 from yaml_where.range import Range
 from yaml_where.yaml_where import YAMLWhereMapping
 from yaml_where.testing.helpers import clean_yaml
@@ -79,3 +79,15 @@ def test_with_no_keys():
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
     with pytest.raises(UndefinedAccessError):
         source_map.get_range()
+
+
+def test_with_index():
+    yaml = """
+    a:
+        b: 42
+        c:
+            doo: hola
+    """
+    source_map = YAMLWhere.from_string(clean_yaml(yaml))
+    with pytest.raises(UndefinedAccessError):
+        source_map.get_range(Index(0))
