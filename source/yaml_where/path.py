@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Any
 
 
-class PathComponent:
+class YAMLPathComponent:
     """A sequence of PathComponents identifies an element in a YAML file.
     
     Elements can be the keys in a mapping, a value in a mapping, or an element in a sequence.
@@ -18,7 +18,10 @@ class PathComponent:
         return f"{type(self).__name__}(value={self.value()})"
 
 
-class Key(PathComponent):
+YAMLPath = tuple[YAMLPathComponent, ...]
+
+
+class Key(YAMLPathComponent):
     "A reference to a *key* in a mapping."
     def __init__(self, value: str):
         self._value = value
@@ -30,7 +33,7 @@ class Key(PathComponent):
         return f"key/{self.value()}"
 
 
-class Value(PathComponent):
+class Value(YAMLPathComponent):
     "A reference to a *value* in a mapping"
     def __init__(self, value: Any):
         self._value = value 
@@ -42,7 +45,7 @@ class Value(PathComponent):
         return f"value/{self.value()}"
 
 
-class Index(PathComponent):
+class Index(YAMLPathComponent):
     "A reference to the index-th element in a sequence"
     def __init__(self, index: int):
         self._index = index
