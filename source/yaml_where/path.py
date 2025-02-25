@@ -3,6 +3,10 @@ from typing import Any
 
 
 class PathComponent:
+    """A sequence of PathComponents identifies an element in a YAML file.
+    
+    Elements can be the keys in a mapping, a value in a mapping, or an element in a sequence.
+    """
     @abstractmethod
     def value(self) -> Any:
         "Get the value associated with this path component"
@@ -15,6 +19,7 @@ class PathComponent:
 
 
 class Key(PathComponent):
+    "A reference to a *key* in a mapping."
     def __init__(self, value: str):
         self._value = value
 
@@ -26,6 +31,7 @@ class Key(PathComponent):
 
 
 class Value(PathComponent):
+    "A reference to a *value* in a mapping"
     def __init__(self, value: Any):
         self._value = value 
 
@@ -37,6 +43,7 @@ class Value(PathComponent):
 
 
 class Index(PathComponent):
+    "A reference to the index-th element in a sequence"
     def __init__(self, index: int):
         self._index = index
 
