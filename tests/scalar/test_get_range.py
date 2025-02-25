@@ -29,7 +29,7 @@ def test_get_with_key():
 def test_get_key():
     yaml = "hello"
     with pytest.raises(UndefinedAccessError):
-        YAMLWhere.from_string(yaml).get_key_range("a")
+        YAMLWhere.from_string(yaml).get_range("a")
 
 
 def test_constructor_checks_node_type():

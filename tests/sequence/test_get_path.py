@@ -5,26 +5,30 @@ from yaml_where.range import Range
 from yaml_where.yaml_where import YAMLWhere
 from yaml_where.testing.helpers import clean_yaml
 
-def test_get_top_level():
+class TestGetTopLevel:
     yaml = """
-    [1,
-     a, foo,
-     
-         indented]
+        [1,
+        a, foo,
+        
+            indented]
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
 
-    range_0 = source_map.get_range(0)
-    assert source_map.get_path(range_0.start) == (Index(0),)
+    def test_1(self):
+        range_0 = self.source_map.get_range(Index(0))
+        assert self.source_map.get_path(range_0.start) == (Index(0),)
 
-    range_1 = source_map.get_range(1)
-    assert  source_map.get_path(range_1.start)== (Index(1),)
+    def test_2(self):
+        range_1 = self.source_map.get_range(Index(1))
+        assert  self.source_map.get_path(range_1.start)== (Index(1),)
 
-    range_2 = source_map.get_range(2)
-    assert source_map.get_path(range_2.start) == (Index(2),)
+    def test_3(self):
+        range_2 = self.source_map.get_range(Index(2))
+        assert self.source_map.get_path(range_2.start) == (Index(2),)
 
-    range_3 = source_map.get_range(3)
-    assert source_map.get_path(range_3.start) == (Index(3),)
+    def test_4(self):
+        range_3 = self.source_map.get_range(Index(3))
+        assert self.source_map.get_path(range_3.start) == (Index(3),)
 
 
 def test_nested():
@@ -35,7 +39,7 @@ def test_nested():
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
 
-    rng = source_map.get_range(1, 1)
+    rng = source_map.get_range(Index(1), Index(1))
     assert source_map.get_path(rng.start) == (Index(1), Index(1))
 
 

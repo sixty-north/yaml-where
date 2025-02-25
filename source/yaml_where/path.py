@@ -21,26 +21,26 @@ class YAMLPathComponent:
 YAMLPath = tuple[YAMLPathComponent, ...]
 
 
-class Key(YAMLPathComponent):
-    "A reference to a *key* in a mapping."
-    def __init__(self, value: str):
-        self._value = value
-
-    def value(self) -> str:
-        return self._value
-
-    def __str__(self):
-        return f"key/{self.value()}"
-
-
-class Value(YAMLPathComponent):
-    "A reference to a *value* in a mapping"
+class Item(YAMLPathComponent):
+    "A reference to a *key-value pair* in a mapping"
     def __init__(self, value: Any):
         self._value = value 
 
     def value(self) -> Any:
+        "The key in the mapping."
         return self._value
 
+    def __str__(self):
+        return f"item/{self.value()}"
+
+class Key(Item):
+    "A reference to a *key* in a mapping"
+    def __str__(self):
+        return f"key/{self.value()}"
+
+
+class Value(Item):
+    "A reference to a *value* in a mapping"
     def __str__(self):
         return f"value/{self.value()}"
 

@@ -1,27 +1,35 @@
 import pytest
 from yaml_where import YAMLWhere
 from yaml_where.exceptions import NoSuchPathError
-from yaml_where.path import Key, Value
+from yaml_where.path import Item, Key, Value
 from yaml_where.testing.helpers import clean_yaml
 
 
-def test_top_level():
+class TestTopLevel:
     source_map = YAMLWhere.from_string("a: 1\nb: 42")
 
-    r = source_map.get_key_range("a")
-    assert source_map.get_path(r.start) == (Key("a"),)
 
-    r = source_map.get_value_range("a")
-    assert source_map.get_path(r.start) == (Value("a"),)
-
-    r = source_map.get_key_range("b")
-    assert source_map.get_path(r.start) == (Key("b"),)
-
-    r = source_map.get_value_range("b")
-    assert source_map.get_path(r.start) == (Value("b"),)
+    def test_1(self):
+        r = self.source_map.get_range(Key("a"))
+        assert self.source_map.get_path(r.start) == (Key("a"),)
 
 
-def test_nested():
+    def test_2(self):
+        r = self.source_map.get_range(Value("a"))
+        assert self.source_map.get_path(r.start) == (Value("a"),)
+
+
+    def test_3(self):
+        r = self.source_map.get_range(Key("b"))
+        assert self.source_map.get_path(r.start) == (Key("b"),)
+
+
+    def test_4(self):
+        r = self.source_map.get_range(Value("b"))
+        assert self.source_map.get_path(r.start) == (Value("b"),)
+
+
+class TestNested:
     yaml = """
     a:
         b: 42
@@ -30,24 +38,74 @@ def test_nested():
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
 
-    r = source_map.get_key_range("a", "b")
-    assert source_map.get_path(r.start) == (Value("a"), Key("b"),)
 
-    r = source_map.get_value_range("a", "b")
-    assert source_map.get_path(r.start) == (Value("a"), Value("b"),)
+    def test_nested_1(self):
+        r = self.source_map.get_range(Value("a"), Key("b"))
+        assert self.source_map.get_path(r.start) == (Value("a"), Key("b"))
 
-    r = source_map.get_key_range("a", "c")
-    assert source_map.get_path(r.start) == (Value("a"), Key("c"),)
 
-    # Interesting that we can't really distinguish between the value of 'c' and the key of 'd'.
-    r = source_map.get_value_range("a", "c")
-    assert source_map.get_path(r.start) == (Value("a"), Value("c"), Key("d"),)
+    def test_nested_2(self):
+        r = self.source_map.get_range(Value("a"), Value("b"))
+        assert self.source_map.get_path(r.start) == (Value("a"), Value("b"))
 
-    r = source_map.get_key_range("a", "c", "d")
-    assert source_map.get_path(r.start) == (Value("a"), Value("c"), Key("d"),)
 
-    r = source_map.get_value_range("a", "c", "d")
-    assert source_map.get_path(r.start) == (Value("a"), Value("c"), Value("d"),)
+    def test_nested_3(self):
+        r = self.source_map.get_range(Value("a"), Key("c"))
+        assert self.source_map.get_path(r.start) == (Value("a"), Key("c"))
+
+
+    def test_nested_4(self):
+        r = self.source_map.get_range(Value("a"), Value("c"))
+        assert self.source_map.get_path(r.start) == (Value("a"), Value("c"), Key("d"))
+
+
+    def test_nested_5(self):
+        r = self.source_map.get_range(Value("a"), Value("c"), Key("d"))
+        assert self.source_map.get_path(r.start) == (
+            Value("a"),
+            Value("c"),
+            Key("d"),
+        )
+
+
+    def test_nested_6(self):
+        r = self.source_map.get_range(Value("a"), Value("c"), Value("d"))
+        assert self.source_map.get_path(r.start) == (
+            Value("a"),
+            Value("c"),
+            Value("d"),
+        )
+
+
+    def test_nested_7(self):
+        r = self.source_map.get_range(Item("a"))
+        assert self.source_map.get_path(r.start) == (Key("a"),)
+
+
+    def test_nested_8(self):
+        r = self.source_map.get_range(Value("a"), Item("c"))
+        assert self.source_map.get_path(r.start) == (
+            Value("a"),
+            Key("c"),
+        )
+
+
+    def test_nested_9(self):
+        r = self.source_map.get_range(Value("a"), Value("c"), Item("d"))
+        assert self.source_map.get_path(r.start) == (
+            Value("a"),
+            Key("c"),
+            Key("d"),
+        )
+
+
+    def test_nested_10(self):
+        r = self.source_map.get_range(Item("a"), Item("c"), Item("d"))
+        assert self.source_map.get_path(r.start) == (
+            Value("a"),
+            Key("c"),
+            Key("d"),
+        )
 
 
 def test_not_found():
@@ -59,7 +117,7 @@ def test_not_found():
     """
     source_map = YAMLWhere.from_string(clean_yaml(yaml))
 
-    r = source_map.get_value_range("a", "c", "d")
+    r = source_map.get_range(Value("a"), Value("c"), Value("d"))
 
     with pytest.raises(NoSuchPathError):
         source_map.get_path(r.end)
