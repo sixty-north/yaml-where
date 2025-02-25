@@ -14,7 +14,7 @@ YAML documents.
 
 ### Mappings
 
-Find the range containg the key and value of a map entry:
+Find the range containing the key and value of a map entry:
 
 ```python
 source_map = YAMLWhere.from_string("a: 1\nb: 42")
